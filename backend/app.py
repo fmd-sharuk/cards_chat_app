@@ -249,7 +249,7 @@ def send_message():
     msg = data.get('message', '')
     if not msg:
         return jsonify({"status": "error"}), 400
-    key = f"cards_{sender}_{receiver}"
+    key = f"cards_{min(sender, receiver)}_{max(sender, receiver)}"
     enc = encrypt(msg, key)
     conn = get_db()
     cur = conn.cursor()
@@ -278,7 +278,7 @@ def get_messages(u1, u2):
         ORDER BY sent_at
     """, (u1n, u2n, u2n, u1n))
     rows = cur.fetchall()
-    key = f"cards_{u1n}_{u2n}"
+    key = f"cards_{min(u1n, u2n)}_{max(u1n, u2n)}"
     msgs = []
     for s, r, m, t in rows:
         try:
