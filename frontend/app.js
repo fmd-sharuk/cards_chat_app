@@ -13,7 +13,8 @@ function login() {
     .then(res => res.json())
     .then(data => {
         if (data.status === "success") {
-            localStorage.setItem("user", username);
+            sessionStorage.setItem("user", username);
+            console.log("[LOGIN] User stored:", username);
             window.location.href = "home.html";
         } else alert(data.message || data.status);
     });
@@ -33,55 +34,49 @@ function signup() {
 }
 
 // =====================
-// HOME INIT (FINAL FIX)
+// HOME INIT
 // =====================
 function initHome() {
     if (!window.location.pathname.includes("home.html")) return;
 
-    const user = localStorage.getItem("user");
+    const user = sessionStorage.getItem("user");
 
     if (!user) {
         window.location.href = "index.html";
         return;
     }
 
-    // Clear stale chat state on home load
-    localStorage.removeItem("chatWith");
+    sessionStorage.removeItem("chatWith");
 
     document.getElementById("userDisplay").innerText = "👤 " + user;
 
-    // Initialize socket connection for this user session
-    // Socket is created on-demand to ensure isolation
     if (!window.chatSocket) {
         window.chatSocket = io(API);
         
         window.chatSocket.on("connect", () => {
-            console.log("Socket connected for user:", user);
+            console.log("[SOCKET] Connected for user:", user);
         });
 
-        // Realtime: new friend request received
         window.chatSocket.on("friend_request", (data) => {
             if (data.to === user) {
-                console.log("New friend request for:", user);
+                console.log("[SOCKET] New friend request for:", user);
                 loadRequests();
                 loadSentRequests();
                 loadFriends();
             }
         });
 
-        // Realtime: friend list updated (e.g., after accept)
         window.chatSocket.on("friend_update", (data) => {
             if (data.user === user) {
-                console.log("Friend update for:", user);
+                console.log("[SOCKET] Friend update for:", user);
                 loadFriends();
                 loadRequests();
                 loadSentRequests();
             }
         });
 
-        // Realtime: receive message
         window.chatSocket.on("receive_message", (data) => {
-            console.log("Message received for:", user, data);
+            console.log("[SOCKET] Message received for:", user, data);
             if (window.location.pathname.includes("chat.html")) {
                 appendMessage(data.sender, data.message);
             }
@@ -89,30 +84,26 @@ function initHome() {
     }
 
     function refreshAll() {
-        console.log("Refreshing UI for user:", user);
+        console.log("[HOME] Refreshing UI for user:", user);
         loadFriends();
         loadRequests();
         loadSentRequests();
     }
 
-    // ✅ LOAD IMMEDIATELY
     refreshAll();
 
-    // ✅ KEEP LIVE UPDATES - poll every 2 seconds
     const intervalId = setInterval(refreshAll, 2000);
 
-    // Cleanup on page leave
     window.addEventListener("beforeunload", () => {
         clearInterval(intervalId);
     });
 }
 
-// Run on DOM ready
-document.addEventListener("DOMContentLoaded", initHome);
+initHome();
 
 function loadAll() {
-    const user = localStorage.getItem("user");
-    console.log("Loading all data for:", user);
+    const user = sessionStorage.getItem("user");
+    console.log("[LOADALL] Loading for:", user);
     loadFriends();
     loadRequests();
     loadSentRequests();
@@ -120,7 +111,7 @@ function loadAll() {
 
 // ADD FRIEND
 function addFriend() {
-    const user1 = localStorage.getItem("user");
+    const user1 = sessionStorage.getItem("user");
     const user2 = document.getElementById("friendInput").value.trim();
 
     if (!user2 || user1 === user2) return alert("Invalid username");
@@ -133,31 +124,34 @@ function addFriend() {
     .then(res => res.json())
     .then(data => {
         alert(data.message || data.status);
-        if (data.status === "success") {
+        if (data.status === "success" || data.status === "exists") {
             document.getElementById("friendInput").value = "";
-            loadAll();
-        } else if (data.status === "exists") {
             loadAll();
         }
     })
-    .catch(err => console.error(err));
+    .catch(err => console.error("[addFriend] Error:", err));
 }
 
 // LOAD REQUESTS
 function loadRequests() {
-    const user = localStorage.getItem("user");
+    const user = sessionStorage.getItem("user");
+    console.log("[loadRequests] for:", user);
 
     fetch(API + "/get_requests", {
         method: "POST",
         headers: {"Content-Type": "application/json"},
         body: JSON.stringify({ user })
     })
-    .then(res => res.json())
+    .then(res => {
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        return res.json();
+    })
     .then(data => {
+        console.log("[loadRequests] got:", data);
         const list = document.getElementById("requestList");
         list.innerHTML = "";
 
-        if (!data || !Array.isArray(data) || data.length === 0) {
+        if (!Array.isArray(data) || data.length === 0) {
             list.innerHTML = "<p>No requests</p>";
             return;
         }
@@ -170,35 +164,45 @@ function loadRequests() {
                 </div>`;
         });
     })
-    .catch(err => console.error(err));
+    .catch(err => console.error("[loadRequests] Error:", err));
 }
 
-// ACCEPT
+// ACCEPT FRIEND
 function acceptFriend(sender) {
-    const user = localStorage.getItem("user");
+    const user = sessionStorage.getItem("user");
 
     fetch(API + "/accept_friend", {
         method: "POST",
         headers: {"Content-Type": "application/json"},
         body: JSON.stringify({ user1: user, user2: sender })
     })
-    .then(res => res.json())
+    .then(res => {
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        return res.json();
+    })
     .then(data => {
+        console.log("[acceptFriend] response:", data);
         if (data.status === "accepted") {
-            console.log("Friend accepted, refreshing all data");
-            loadAll();
+            loadFriends();
+            loadRequests();
+            loadSentRequests();
         }
     })
-    .catch(err => console.error(err));
+    .catch(err => console.error("[acceptFriend] Error:", err));
 }
 
-// FRIENDS
+// FRIENDS LIST
 function loadFriends() {
-    const user = localStorage.getItem("user");
+    const user = sessionStorage.getItem("user");
+    console.log("[loadFriends] for:", user);
 
     fetch(API + "/friends/" + encodeURIComponent(user))
-    .then(res => res.json())
+    .then(res => {
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        return res.json();
+    })
     .then(data => {
+        console.log("[loadFriends] got:", data);
         const list = document.getElementById("friendList");
         list.innerHTML = "";
 
@@ -214,25 +218,30 @@ function loadFriends() {
                 </div>`;
         });
     })
-    .catch(err => console.error(err));
+    .catch(err => console.error("[loadFriends] Error:", err));
 }
 
 function openChat(friend) {
-    localStorage.setItem("chatWith", friend);
+    sessionStorage.setItem("chatWith", friend);
     window.location.href = "chat.html";
 }
 
-// SENT
+// SENT REQUESTS
 function loadSentRequests() {
-    const user = localStorage.getItem("user");
+    const user = sessionStorage.getItem("user");
+    console.log("[loadSentRequests] for:", user);
 
     fetch(API + "/get_sent_requests", {
         method: "POST",
         headers: {"Content-Type": "application/json"},
         body: JSON.stringify({ user })
     })
-    .then(res => res.json())
+    .then(res => {
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        return res.json();
+    })
     .then(data => {
+        console.log("[loadSentRequests] got:", data);
         const list = document.getElementById("sentList");
         list.innerHTML = "";
 
@@ -245,52 +254,49 @@ function loadSentRequests() {
             list.innerHTML += `<div class="sent-item">⏳ ${u}</div>`;
         });
     })
-    .catch(err => console.error(err));
+    .catch(err => console.error("[loadSentRequests] Error:", err));
 }
 
-// CHAT INIT
+// CHAT
 if (window.location.pathname.includes("chat.html")) {
-    const user = localStorage.getItem("user");
-    const friend = localStorage.getItem("chatWith");
+    const user = sessionStorage.getItem("user");
+    const friend = sessionStorage.getItem("chatWith");
 
     if (!user || !friend) {
         window.location.href = "home.html";
     } else {
-        // Initialize socket connection
         if (!window.chatSocket) {
             window.chatSocket = io(API);
         }
 
-        // Room format must match backend: user__receiver (and we join both directions)
         const room = user + "__" + friend;
+        console.log("[CHAT] Room:", room);
         window.chatSocket.emit("join", { room });
 
         loadMessages();
 
         window.chatSocket.on("receive_message", (data) => {
-            console.log("Received message in chat:", data);
+            console.log("[CHAT] Received:", data);
             appendMessage(data.sender, data.message);
         });
     }
 }
 
 function sendMessage() {
-    const sender = localStorage.getItem("user");
-    const receiver = localStorage.getItem("chatWith");
+    const sender = sessionStorage.getItem("user");
+    const receiver = sessionStorage.getItem("chatWith");
     const message = document.getElementById("msgInput").value.trim();
 
     if (!message) return;
 
     const room = sender + "__" + receiver;
 
-    // ✅ save to database via HTTP
     fetch(API + "/send_message", {
         method: "POST",
         headers: {"Content-Type": "application/json"},
         body: JSON.stringify({sender, receiver, message})
-    }).catch(err => console.error(err));
+    }).catch(err => console.error("[sendMessage] Error:", err));
 
-    // ✅ real-time emit via socket
     if (window.chatSocket) {
         window.chatSocket.emit("send_message", {
             room: room,
@@ -299,37 +305,41 @@ function sendMessage() {
         });
     }
 
-    // Also append locally for instant feedback
     appendMessage(sender, message);
 
     document.getElementById("msgInput").value = "";
 }
 
 function loadMessages() {
-    const u1 = localStorage.getItem("user");
-    const u2 = localStorage.getItem("chatWith");
+    const user1 = sessionStorage.getItem("user");
+    const user2 = sessionStorage.getItem("chatWith");
 
-    fetch(API + `/messages/${encodeURIComponent(u1)}/${encodeURIComponent(u2)}`)
-    .then(res => res.json())
+    console.log("[loadMessages] between:", user1, user2);
+
+    fetch(API + `/messages/${encodeURIComponent(user1)}/${encodeURIComponent(user2)}`)
+    .then(res => {
+        if (!res.ok) throw new Error("HTTP " + res.status);
+        return res.json();
+    })
     .then(data => {
+        console.log("[loadMessages] got:", data);
         const box = document.getElementById("messages");
         box.innerHTML = "";
         if (Array.isArray(data)) {
             data.forEach(m => appendMessage(m.sender, m.message));
         }
     })
-    .catch(err => console.error(err));
+    .catch(err => console.error("[loadMessages] Error:", err));
 }
 
 function appendMessage(sender, message) {
     const box = document.getElementById("messages");
-    const isCurrentUser = sender === localStorage.getItem("user");
+    const isCurrentUser = sender === sessionStorage.getItem("user");
 
     box.innerHTML += `
         <div class="${isCurrentUser ? "me" : "other"}">
             ${message}
         </div>`;
 
-    // Auto-scroll to bottom
     box.scrollTop = box.scrollHeight;
 }
