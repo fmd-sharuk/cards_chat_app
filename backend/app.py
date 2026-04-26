@@ -241,28 +241,28 @@ def remove_friend():
     conn.close()
     return jsonify({"status": "success"})
 
-@app.route('/send_message', methods=['POST'])
-def send_message():
-    data = request.json
+@socketio.on('send_message')
+def handle_send_message(data):
     sender = norm(data.get('sender', ''))
     receiver = norm(data.get('receiver', ''))
-    msg = data.get('message', '')
-    if not msg:
-        return jsonify({"status": "error"}), 400
+    message = data.get('message', '')
+    if not sender or not receiver or not message:
+        return
+    room = '__'.join(sorted([sender, receiver]))
     key = f"cards_{min(sender, receiver)}_{max(sender, receiver)}"
-    enc = encrypt(msg, key)
+    encrypted = encrypt(message, key)
     conn = get_db()
     cur = conn.cursor()
-    cur.execute("INSERT INTO messages (sender, receiver, message) VALUES (%s, %s, %s)", (sender, receiver, enc))
+    cur.execute("INSERT INTO messages (sender, receiver, message) VALUES (%s, %s, %s)", (sender, receiver, encrypted))
     conn.commit()
     cur.close()
     conn.close()
-    r1 = f"chat_{sender}__{receiver}"
-    r2 = f"chat_{receiver}__{sender}"
-    socketio.emit('new_message', {'sender': sender, 'receiver': receiver, 'message': msg}, room=r1)
-    socketio.emit('new_message', {'sender': sender, 'receiver': receiver, 'message': msg}, room=r2)
-    print(f"[MSG] {sender} -> {receiver}")
-    return jsonify({"status": "success"})
+    socketio.emit('receive_message', {'sender': sender, 'receiver': receiver, 'message': message}, room=room)
+    print(f'[MSG] {sender} -> {receiver} via socket')
+
+@app.route('/send_message', methods=['POST'])
+def send_message():
+    return jsonify({"status": "error", "message": "Use socket"}), 400
 
 @app.route('/messages/<u1>/<u2>', methods=['GET'])
 def get_messages(u1, u2):
@@ -316,9 +316,9 @@ def on_join_user(data):
 def on_join_chat(data):
     u1 = norm(data.get('user1', ''))
     u2 = norm(data.get('user2', ''))
-    join_room(f"chat_{u1}__{u2}")
-    join_room(f"chat_{u2}__{u1}")
-    print(f"[JOIN] {request.sid} -> chat_{u1}__{u2}")
+    room = '__'.join(sorted([u1, u2]))
+    join_room(room)
+    print(f'[JOIN] {request.sid} -> {room}')
 
 if __name__ == '__main__':
     socketio.run(app, debug=True, host='0.0.0.0', port=5000)

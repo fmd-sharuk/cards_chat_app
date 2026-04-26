@@ -141,7 +141,7 @@ function initSocket(username) {
         }
     });
 
-    socket.on('new_message', (data) => {
+    socket.on('receive_message', (data) => {
         console.log('New message:', data);
         if ((data.sender === chatPartner && data.receiver === username) || 
             (data.receiver === chatPartner && data.sender === username)) {
@@ -461,10 +461,10 @@ function sendMessage(e) {
 
     if (!message || !chatPartner) return;
 
-    fetch(`${API}/send_message`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ sender: currentUser, receiver: chatPartner, message })
+    socket.emit('send_message', {
+        sender: currentUser,
+        receiver: chatPartner,
+        message: message
     });
 
     input.value = '';
