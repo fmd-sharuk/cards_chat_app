@@ -115,6 +115,7 @@ function initSocket(username) {
 
     socket.on('connect', () => {
         console.log('Socket connected');
+        socket.emit('register_user', { username: username });
         socket.emit('join_user', { user: username });
     });
 
@@ -145,7 +146,7 @@ function initSocket(username) {
         console.log('New message:', data);
         if ((data.sender === chatPartner && data.receiver === username) || 
             (data.receiver === chatPartner && data.sender === username)) {
-            appendMessage(data.sender, data.message, data.sent_at);
+            appendMessage(data.sender, data.message);
         }
     });
 }

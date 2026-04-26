@@ -257,8 +257,19 @@ def handle_send_message(data):
     conn.commit()
     cur.close()
     conn.close()
-    socketio.emit('receive_message', {'sender': sender, 'receiver': receiver, 'message': message}, room=room)
-    print(f'[MSG] {sender} -> {receiver} via socket')
+    socketio.emit('receive_message', {
+        'sender': sender,
+        'receiver': receiver,
+        'message': message
+    }, room=room)
+
+    socketio.emit('receive_message', {
+        'sender': sender,
+        'receiver': receiver,
+        'message': message
+    }, room=receiver)
+
+    print(f'SEND: {sender} -> {receiver} room={room}')
 
 @app.route('/send_message', methods=['POST'])
 def send_message():
@@ -299,12 +310,18 @@ def get_messages(u1, u2):
     return jsonify(msgs)
 
 @socketio.on('connect')
-def on_connect():
+def handle_connect():
     print(f"[SOCKET] Connected: {request.sid}")
 
 @socketio.on('disconnect')
-def on_disconnect():
+def handle_disconnect():
     print(f"[SOCKET] Disconnected: {request.sid}")
+
+@socketio.on('register_user')
+def register_user(data):
+    username = data["username"]
+    join_room(username)
+    print(f'[JOIN] {request.sid} -> user_{username}')
 
 @socketio.on('join_user')
 def on_join_user(data):
