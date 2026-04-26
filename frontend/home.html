@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="stylesheet" href="./style.css">
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="sidebar">
+        <h3 id="userDisplay"></h3>
+
+        <input id="friendInput" placeholder="Add Friend">
+        <button onclick="addFriend()">Add</button>
+
+        <h4>Friends</h4>
+        <div id="friendList"></div>
+
+        <h4>Requests</h4>
+        <div id="requestList"></div>
+
+        <!-- Fixed: moved inside sidebar -->
+        <h4>Sent Requests</h4>
+        <div id="sentList"></div>
+    </div>
+
+    <div class="chat-area">
+        <h2>Select a friend to chat</h2>
+    </div>
+
+</div>
+
+<!-- Socket.IO client library for real-time features -->
+<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+<!-- Fixed: defer -->
+<script src="app.js" defer></script>
+
+</body>
+</html>

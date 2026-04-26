@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="stylesheet" href="./style.css">
+</head>
+
+<body>
+
+<div class="auth-container">
+    <div class="auth-box">
+        <h2>CARDS Secure Login</h2>
+
+        <input id="username" placeholder="Username">
+        <input id="password" type="password" placeholder="Password">
+
+        <button onclick="signup()">Signup</button>
+        <button onclick="login()">Login</button>
+    </div>
+</div>
+
+<!-- Socket.IO client library for real-time features -->
+<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+<!-- Fixed: defer -->
+<script src="app.js" defer></script>
+
+</body>
+</html>
