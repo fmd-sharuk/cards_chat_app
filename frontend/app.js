@@ -460,7 +460,6 @@ function sendMessage(e) {
         body: JSON.stringify({ sender: currentUser, receiver: chatPartner, message })
     });
 
-    appendMessage(currentUser, message, new Date().toISOString());
     input.value = '';
 }
 
