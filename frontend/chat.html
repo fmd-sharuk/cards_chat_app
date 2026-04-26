@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cards Chat - Conversation</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container">
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>📨 Cards Chat</h2>
+        </div>
+
+        <div class="user-profile">
+            <div class="avatar" id="user-avatar">U</div>
+            <div class="user-info">
+                <h3 id="username-display">User</h3>
+                <span id="user-status">● Online</span>
+            </div>
+            <button class="logout-btn" onclick="handleLogout()">Logout</button>
+        </div>
+
+        <div class="section-header">
+            <span>Conversations</span>
+        </div>
+        <div class="friends-list" id="friends-list"></div>
+
+        <div class="section-header">
+            <span>Requests</span>
+        </div>
+        <div class="requests-list" id="requests-list"></div>
+    </aside>
+
+    <main class="chat-area">
+        <div class="chat-header">
+            <div class="chat-header-info">
+                <div class="friend-avatar" id="chat-avatar">U</div>
+                <div>
+                    <h2 id="chat-username">User</h2>
+                    <p id="chat-status">Online</p>
+                </div>
+            </div>
+            <button class="btn-decline" onclick="goBack()">Back</button>
+        </div>
+        <div class="messages-container" id="messages-container"></div>
+        <div class="input-area">
+            <form onsubmit="sendMessage(event)">
+                <input type="text" id="message-input" placeholder="Type a message..." autocomplete="off">
+                <button type="submit" id="send-btn">Send</button>
+            </form>
+        </div>
+    </main>
+</div>
+
+<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+<script src="app.js" defer></script>
+
+</body>
+</html>

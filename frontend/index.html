@@ -1,26 +1,42 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<link rel="stylesheet" href="./style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cards Chat - Login</title>
+    <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
 
 <div class="auth-container">
     <div class="auth-box">
-        <h2>CARDS Secure Login</h2>
+        <h2>📨 Cards Chat</h2>
+        <p style="text-align: center; color: #999; margin-bottom: 30px;">Secure, encrypted messaging</p>
+        
+        <div id="auth-tabs" style="display: flex; margin-bottom: 20px; border-bottom: 1px solid #333;">
+            <button id="tab-login" class="auth-tab active" style="flex: 1; padding: 12px; background: none; border: none; color: #e50914; font-size: 14px; font-weight: 600; cursor: pointer; border-bottom: 2px solid #e50914;">Login</button>
+            <button id="tab-signup" class="auth-tab" style="flex: 1; padding: 12px; background: none; border: none; color: #999; font-size: 14px; font-weight: 600; cursor: pointer; border-bottom: 2px solid transparent;">Create Account</button>
+        </div>
 
-        <input id="username" placeholder="Username">
-        <input id="password" type="password" placeholder="Password">
+        <div id="login-form">
+            <input type="text" id="login-username" placeholder="Username">
+            <input type="password" id="login-password" placeholder="Password">
+            <button onclick="handleLogin()">Login</button>
+        </div>
 
-        <button onclick="signup()">Signup</button>
-        <button onclick="login()">Login</button>
+        <div id="signup-form" style="display: none;">
+            <input type="text" id="signup-username" placeholder="Choose a username">
+            <input type="password" id="signup-password" placeholder="Password (min 4 chars)">
+            <button onclick="handleSignup()">Create Account</button>
+        </div>
+
+        <p style="text-align: center; margin-top: 20px; font-size: 13px; color: #666;">
+            Your messages are end-to-end encrypted with CARDS cipher
+        </p>
     </div>
 </div>
 
-<!-- Socket.IO client library for real-time features -->
 <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
-<!-- Fixed: defer -->
 <script src="app.js" defer></script>
 
 </body>

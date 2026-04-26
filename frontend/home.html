@@ -1,39 +1,84 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<link rel="stylesheet" href="./style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cards Chat - Messages</title>
+    <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
 
 <div class="container">
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>📨 Cards Chat</h2>
+        </div>
 
-    <div class="sidebar">
-        <h3 id="userDisplay"></h3>
+        <div class="user-profile">
+            <div class="avatar" id="user-avatar">U</div>
+            <div class="user-info">
+                <h3 id="username-display">User</h3>
+                <span id="user-status">● Online</span>
+            </div>
+            <button class="logout-btn" onclick="handleLogout()">Logout</button>
+        </div>
 
-        <input id="friendInput" placeholder="Add Friend">
-        <button onclick="addFriend()">Add</button>
+        <div class="search-area">
+            <input type="text" id="search-users" placeholder="Search users..." oninput="handleSearch()">
+            <div id="search-results" style="display: none; position: absolute; width: 280px; background: #222; border-radius: 8px; margin-top: 8px; max-height: 200px; overflow-y: auto; z-index: 100;"></div>
+        </div>
 
-        <h4>Friends</h4>
-        <div id="friendList"></div>
+        <div class="section-header">
+            <span>Messages</span>
+            <span id="friends-count" style="color: #e50914;">0</span>
+        </div>
+        <div class="friends-list" id="friends-list"></div>
 
-        <h4>Requests</h4>
-        <div id="requestList"></div>
+        <div class="section-header">
+            <span>Requests</span>
+            <span id="requests-count" style="color: #e50914;">0</span>
+        </div>
+        <div class="requests-list" id="requests-list"></div>
 
-        <!-- Fixed: moved inside sidebar -->
-        <h4>Sent Requests</h4>
-        <div id="sentList"></div>
-    </div>
+        <div class="section-header">
+            <span>Sent</span>
+            <span id="sent-count" style="color: #e50914;">0</span>
+        </div>
+        <div class="sent-requests-list" id="sent-list"></div>
+    </aside>
 
-    <div class="chat-area">
-        <h2>Select a friend to chat</h2>
-    </div>
+    <main class="chat-area" id="chat-area">
+        <div class="empty-state" id="empty-chat">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+            </svg>
+            <h3>Welcome to Cards Chat</h3>
+            <p>Search for users above to start a conversation.<br>Your messages are end-to-end encrypted.</p>
+        </div>
 
+        <div class="chat-container" id="chat-container" style="display: none;">
+            <div class="chat-header">
+                <div class="chat-header-info">
+                    <div class="friend-avatar" id="chat-avatar">U</div>
+                    <div>
+                        <h2 id="chat-username">User</h2>
+                        <p id="chat-status">Online</p>
+                    </div>
+                </div>
+                <button class="btn-decline" onclick="closeChat()" style="padding: 8px 16px;">Close</button>
+            </div>
+            <div class="messages-container" id="messages-container"></div>
+            <div class="input-area">
+                <form onsubmit="sendMessage(event)">
+                    <input type="text" id="message-input" placeholder="Type a message..." autocomplete="off">
+                    <button type="submit" id="send-btn">Send</button>
+                </form>
+            </div>
+        </div>
+    </main>
 </div>
 
-<!-- Socket.IO client library for real-time features -->
 <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
-<!-- Fixed: defer -->
 <script src="app.js" defer></script>
 
 </body>
