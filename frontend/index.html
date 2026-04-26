@@ -14,8 +14,8 @@
         <p style="text-align: center; color: #999; margin-bottom: 30px;">Secure, encrypted messaging</p>
         
         <div id="auth-tabs" style="display: flex; margin-bottom: 20px; border-bottom: 1px solid #333;">
-            <button id="tab-login" class="auth-tab active" style="flex: 1; padding: 12px; background: none; border: none; color: #e50914; font-size: 14px; font-weight: 600; cursor: pointer; border-bottom: 2px solid #e50914;">Login</button>
-            <button id="tab-signup" class="auth-tab" style="flex: 1; padding: 12px; background: none; border: none; color: #999; font-size: 14px; font-weight: 600; cursor: pointer; border-bottom: 2px solid transparent;">Create Account</button>
+            <button id="tab-login" class="auth-tab active" onclick="toggleAuthTab('login')" style="flex: 1; padding: 12px; background: none; border: none; color: #e50914; font-size: 14px; font-weight: 600; cursor: pointer; border-bottom: 2px solid #e50914;">Login</button>
+            <button id="tab-signup" class="auth-tab" onclick="toggleAuthTab('signup')" style="flex: 1; padding: 12px; background: none; border: none; color: #999; font-size: 14px; font-weight: 600; cursor: pointer; border-bottom: 2px solid transparent;">Create Account</button>
         </div>
 
         <div id="login-form">
