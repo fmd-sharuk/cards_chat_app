@@ -192,6 +192,13 @@ function loadFriends() {
         list.innerHTML = '';
         document.getElementById('friends-count').textContent = friends.length;
 
+        // Join chat rooms for real-time messaging
+        if (socket && friends.length > 0) {
+            friends.forEach(friend => {
+                socket.emit('join_chat', { user1: currentUser, user2: friend });
+            });
+        }
+
         if (friends.length === 0) {
             list.innerHTML = '<div class="friend-item"><div class="friend-info"><h4>No friends yet</h4><p>Search above to add people</p></div></div>';
             return;

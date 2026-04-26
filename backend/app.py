@@ -278,12 +278,21 @@ def get_messages(u1, u2):
         ORDER BY sent_at
     """, (u1n, u2n, u2n, u1n))
     rows = cur.fetchall()
-    key = f"cards_{min(u1n, u2n)}_{max(u1n, u2n)}"
+    key1 = f"cards_{min(u1n, u2n)}_{max(u1n, u2n)}"
+    key2 = f"cards_{u1n}_{u2n}"
+    key3 = f"cards_{u2n}_{u1n}"
     msgs = []
     for s, r, m, t in rows:
-        try:
-            msgs.append({'sender': s, 'receiver': r, 'message': decrypt(m, key), 'sent_at': t.isoformat()})
-        except:
+        decrypted = None
+        for key in [key1, key2, key3]:
+            try:
+                decrypted = decrypt(m, key)
+                break
+            except:
+                continue
+        if decrypted:
+            msgs.append({'sender': s, 'receiver': r, 'message': decrypted, 'sent_at': t.isoformat()})
+        else:
             msgs.append({'sender': s, 'receiver': r, 'message': '[encrypted]', 'sent_at': t.isoformat()})
     cur.close()
     conn.close()
