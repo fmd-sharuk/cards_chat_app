@@ -1,8 +1,8 @@
-# 📨 Cards Chat - Netflix-Style Encrypted Messaging
+Cards Chat
 
-A full-stack, end-to-end encrypted chat application with Instagram-style interface.
+A full-stack, end-to-end encrypted chat application with custom hashing and cipher algorithm
 
-## 🌟 Features
+Features
 
 - **End-to-End Encryption**: All messages encrypted using CARDS cipher algorithm
 - **Secure Authentication**: CARDS hashing algorithm for password security
@@ -12,23 +12,23 @@ A full-stack, end-to-end encrypted chat application with Instagram-style interfa
 - **Netflix-Style UI**: Dark theme with smooth animations
 - **Multi-Device Support**: Each tab maintains independent session
 
-## 🛠️ Tech Stack
+Tech Stack
 
-**Backend:**
+Backend
 - Python 3.x
 - Flask (Web Framework)
 - Flask-SocketIO (Real-time communication)
 - PostgreSQL (Database)
 - Custom CARDS Hash & Cipher algorithms
 
-**Frontend:**
+Frontend
 - HTML5, CSS3, Vanilla JavaScript
 - Socket.IO Client
 - Netflix-inspired design
 
-## 🚀 Quick Start
+Quick Start
 
-### Backend Setup
+Backend Setup
 
 ```bash
 cd backend
@@ -36,25 +36,25 @@ pip install -r requirements.txt
 python app.py
 ```
 
-### Frontend
+Frontend
 
 Open `frontend/index.html` in your browser (or use a local HTTP server).
 
 **Note:** Flask backend runs on port 5000. Update `API` constant in `app.js` if needed.
 
-## 🔐 Security
+Security
 
-### Authentication
+Authentication
 - Passwords hashed using custom CARDS algorithm with salt (joker)
 - Case-insensitive username handling
 - Session-based authentication via sessionStorage
 
-### Encryption
+Encryption
 - Messages encrypted with CARDS cipher before storage
 - Unique encryption key per conversation: `cards_chat_secret_{user1}_{user2}`
 - End-to-end encryption in transit (Socket.IO) and at rest (DB)
 
-## 📁 Project Structure
+Project Structure
 
 ```
 CARDS_ERA_7/
@@ -71,14 +71,14 @@ CARDS_ERA_7/
     └── style.css           # Netflix-style theme
 ```
 
-## 🎨 UI Components
+ UI Components
 
-### Login Page (index.html)
+Login Page (index.html)
 - Username/Password authentication
 - Account creation
 - Toggle between Login/Signup
 
-### Main Interface (home.html)
+Main Interface (home.html)
 - User profile with logout
 - User search with autocomplete
 - Three sections:
@@ -88,19 +88,19 @@ CARDS_ERA_7/
 - Real-time notifications
 - 3-second auto-refresh
 
-### Chat Interface
+Chat Interface
 - End-to-end encrypted messaging
 - Real-time typing indicators
 - Message history with timestamps
 - Online/offline status
 
-## 🔧 API Endpoints
+API Endpoints
 
-### Authentication
+Authentication
 - `POST /signup` - Create account
 - `POST /login` - Authenticate user
 
-### Friends
+Friends
 - `POST /search_users` - Search users
 - `POST /add_friend` - Send friend request
 - `POST /get_requests` - Get incoming requests
@@ -109,11 +109,11 @@ CARDS_ERA_7/
 - `POST /accept_friend` - Accept request
 - `POST /remove_friend` - Remove friend
 
-### Messaging
+Messaging
 - `POST /send_message` - Send message
 - `GET /messages/<user1>/<user2>` - Get chat history
 
-### Socket.IO Events
+Socket.IO Events
 - `join_user` - Join user notification room
 - `join_chat` - Join chat room
 - `friend_request` - New friend request
@@ -121,7 +121,7 @@ CARDS_ERA_7/
 - `new_message` - New message
 - `user_typing` - Typing indicator
 
-## 🎯 Key Design Decisions
+Key Design Decisions
 
 1. **sessionStorage for Isolation**: Each tab has independent session (prevents cross-tab contamination)
 
@@ -133,7 +133,7 @@ CARDS_ERA_7/
 
 5. **Netflix Aesthetic**: Dark theme, smooth animations, clean typography
 
-## 🔒 Privacy & Security Notes
+Privacy & Security Notes
 
 - Messages encrypted before leaving client
 - Passwords never stored in plaintext
@@ -141,7 +141,7 @@ CARDS_ERA_7/
 - No message logging on server (encrypted blobs only)
 - HTTPS recommended for production
 
-## 🐛 Known Limitations
+Known Limitations
 
 - PostgreSQL database requires external hosting (Supabase in config)
 - No file/media attachments (text-only)
@@ -149,11 +149,11 @@ CARDS_ERA_7/
 - No message deletion/editing
 - No read receipts (but online status available)
 
-## 📝 License
+License
 
 Educational project - CARDS encryption demonstration
 
-## 🙏 Credits
+Credits
 
 - CARDS Hash & Cipher algorithms: Custom implementation
 - UI Design: Inspired by Netflix & Instagram
